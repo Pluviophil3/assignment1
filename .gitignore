@@ -1,0 +1,4 @@
+/heat_seq
+/heat_omp
+/bench_results/
+/slurm_heat_omp_*.out
