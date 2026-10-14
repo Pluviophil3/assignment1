@@ -29,3 +29,19 @@ for p in 1 2 4; do
     grep -E '^(Converged|Not converged) after ' "mpi_validation/mpi20_p${p}.log"
     echo "PASS: p=${p} temperature output matches sequential"
 done
+
+# Eleven rows cannot be divided evenly among four processes.
+./heat_seq 11 13 100000 mpi_validation/seq11x13.txt > mpi_validation/seq11x13.log
+mpiexec -n 4 ./heat_mpi 11 13 100000 mpi_validation/mpi11x13.txt \
+    > mpi_validation/mpi11x13.log
+cmp mpi_validation/seq11x13.txt mpi_validation/mpi11x13.txt
+echo "PASS: uneven 11x13 decomposition matches sequential"
+
+# Exercise the maximum-iteration stop without convergence.
+./heat_seq 11 13 1 mpi_validation/seq11x13_limit.txt \
+    > mpi_validation/seq11x13_limit.log
+mpiexec -n 4 ./heat_mpi 11 13 1 mpi_validation/mpi11x13_limit.txt \
+    > mpi_validation/mpi11x13_limit.log
+cmp mpi_validation/seq11x13_limit.txt mpi_validation/mpi11x13_limit.txt
+grep '^Not converged after 1 iterations' mpi_validation/mpi11x13_limit.log
+echo "PASS: maximum-iteration stop matches sequential"

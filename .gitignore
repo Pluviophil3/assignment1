@@ -5,3 +5,4 @@
 /mpi_validation/
 /slurm_heat_omp_*.out
 /mpi_validate_*.out
+/slurm_heat_mpi_*.out
