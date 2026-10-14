@@ -7,6 +7,6 @@ g++ -O3 heat_seq.cpp -o heat_seq
 g++ -O3 -fopenmp heat_omp.cpp -o heat_omp
 
 for n in 300 400 500; do
-    sbatch -p cmsc5702_hpc -q cmsc5702 \
+    sbatch -p cmsc5702_hpc -q cmsc5702 --time="${HEAT_TIME:-00:10:00}" \
         --export="ALL,HEAT_N=${n}" bench_heat_omp.sh
 done
