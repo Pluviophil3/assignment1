@@ -10,11 +10,7 @@ set -euo pipefail
 cd "${SLURM_SUBMIT_DIR:?}"
 
 mpi_compiler=$(command -v mpicxx)
-mpi_runner="$(dirname "$mpi_compiler")/mpiexec"
-if [[ ! -x "$mpi_runner" ]]; then
-    echo "Matching mpiexec was not found beside $mpi_compiler" >&2
-    exit 1
-fi
+mpi_runner=$(command -v mpiexec)
 echo "Compiler: $mpi_compiler"
 echo "Runner: $mpi_runner"
 
@@ -25,7 +21,9 @@ mkdir -p mpi_validation
 ./heat_seq 20 20 100000 mpi_validation/seq20.txt > mpi_validation/seq20.log
 
 for p in 1 2 4; do
-    "$mpi_runner" -n "$p" ./heat_mpi 20 20 100000 \
+    # Use the command name: Open MPI interprets an absolute /bin/mpiexec
+    # as an installation prefix of / and rejects that empty prefix.
+    mpiexec -n "$p" ./heat_mpi 20 20 100000 \
         "mpi_validation/mpi20_p${p}.txt" > "mpi_validation/mpi20_p${p}.log"
     cmp mpi_validation/seq20.txt "mpi_validation/mpi20_p${p}.txt"
     grep -E '^(Converged|Not converged) after ' "mpi_validation/mpi20_p${p}.log"
