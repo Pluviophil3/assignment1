@@ -43,6 +43,9 @@ run_five() {
             echo "Could not read elapsed time from $log" >&2
             exit 1
         fi
+        if [[ "$program" == omp ]]; then
+            cmp "bench_results/seq_n${HEAT_N}_p1.txt" "$solution"
+        fi
         printf '%s,%s,%s,%s\n' "$HEAT_N" "$p" "$run" "$seconds" >> "$csv"
         grep -E '^(Converged|Not converged) after ' "$log"
         echo "${program}: n=${HEAT_N}, p=${p}, run=${run}, seconds=${seconds}"
@@ -52,8 +55,6 @@ run_five() {
 run_five seq 1 "$seq_csv"
 for p in 1 2 4 8 16 32; do
     run_five omp "$p" "$omp_csv"
-    cmp "bench_results/seq_n${HEAT_N}_p1.txt" \
-        "bench_results/omp_n${HEAT_N}_p${p}.txt"
 done
 
 echo "PASS: n=${HEAT_N}; all OpenMP results match the sequential result"
